@@ -1,5 +1,10 @@
-function greet() {
-    console.log("Node.js Application Deployed Successfully!");
-}
+const express = require('express');
+const app = express();
 
-greet();
+app.get('/', (req, res) => {
+    res.send("Node App Running Successfully via Jenkins Deployment!");
+});
+
+app.listen(3000, () => {
+    console.log("Server running on port 3000");
+});
