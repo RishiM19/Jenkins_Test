@@ -1,0 +1,54 @@
+pipeline {
+    agent any
+
+    tools {
+        maven 'Maven'
+    }
+
+    environment {
+        TOMCAT_HOME = "/opt/homebrew/Cellar/tomcat/11.0.18/libexec"
+    }
+
+    stages {
+
+        stage('Checkout Code') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Build WAR') {
+            steps {
+                sh 'mvn clean package'
+            }
+        }
+
+        stage('Stop Tomcat') {
+            steps {
+                sh '${TOMCAT_HOME}/bin/catalina.sh stop || true'
+                sleep 5
+            }
+        }
+
+        stage('Deploy WAR') {
+            steps {
+                sh 'cp target/*.war ${TOMCAT_HOME}/webapps/'
+            }
+        }
+
+        stage('Start Tomcat') {
+            steps {
+                sh '${TOMCAT_HOME}/bin/catalina.sh start'
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Spring Boot Application Deployed Successfully!'
+        }
+        failure {
+            echo 'Deployment Failed!'
+        }
+    }
+}
