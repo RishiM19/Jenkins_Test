@@ -6,7 +6,7 @@ pipeline {
     }
 
     environment {
-        TOMCAT_HOME = "/opt/homebrew/Cellar/tomcat/11.0.18/libexec"
+        TOMCAT_HOME = "/usr/local/opt/tomcat/libexec"
     }
 
     stages {
@@ -19,7 +19,9 @@ pipeline {
 
         stage('Build WAR') {
             steps {
-                sh 'mvn clean package'
+                dir('springbootapp') {
+                    sh 'mvn clean package'
+                }
             }
         }
 
@@ -32,7 +34,9 @@ pipeline {
 
         stage('Deploy WAR') {
             steps {
-                sh 'cp target/*.war ${TOMCAT_HOME}/webapps/'
+                dir('springbootapp') {
+                    sh 'cp target/*.war ${TOMCAT_HOME}/webapps/'
+                }
             }
         }
 
