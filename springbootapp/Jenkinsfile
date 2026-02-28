@@ -6,7 +6,7 @@ pipeline {
     }
 
     environment {
-        TOMCAT_HOME = "/usr/local/opt/tomcat/libexec"
+        TOMCAT_HOME = "/opt/homebrew/opt/tomcat/libexec"
     }
 
     stages {
