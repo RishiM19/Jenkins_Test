@@ -1,12 +1,8 @@
 pipeline {
-    agent any
+    agent { label 'master-node1' }
 
     tools {
         maven 'Maven'
-    }
-
-    environment {
-        TOMCAT_HOME = "/opt/homebrew/opt/tomcat/libexec"
     }
 
     stages {
@@ -17,42 +13,38 @@ pipeline {
             }
         }
 
-        stage('Build WAR') {
+        stage('Build') {
             steps {
                 dir('springbootapp') {
-                    sh 'mvn clean package'
+                    sh 'mvn clean compile'
                 }
             }
         }
 
-        stage('Stop Tomcat') {
-            steps {
-                sh '${TOMCAT_HOME}/bin/catalina.sh stop || true'
-                sleep 5
-            }
-        }
-
-        stage('Deploy WAR') {
+        stage('Test') {
             steps {
                 dir('springbootapp') {
-                    sh 'cp target/*.war ${TOMCAT_HOME}/webapps/'
+                    sh 'mvn test'
                 }
             }
         }
 
-        stage('Start Tomcat') {
+        stage('Package') {
             steps {
-                sh '${TOMCAT_HOME}/bin/catalina.sh start'
+                dir('springbootapp') {
+                    sh 'mvn package'
+                }
             }
         }
     }
 
     post {
         success {
-            echo 'Spring Boot Application Deployed Successfully!'
+            echo 'Build Successful on master-node1!'
+            archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
         }
         failure {
-            echo 'Deployment Failed!'
+            echo 'Build Failed on master-node1!'
         }
     }
 }
